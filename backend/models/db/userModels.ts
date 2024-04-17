@@ -1,5 +1,13 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
+
+export interface UserDocument extends Document {
+  username: string;
+  email: string;
+  password: string;
+  isAdmin: boolean;
+  matchPassword: (enteredPassword: string) => Promise<boolean>;
+}
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -36,7 +44,7 @@ const userSchema = new mongoose.Schema({
 });
 
 // Method to compare passwords
-userSchema.methods.matchPassword = async function (enteredPassword: any) {
+userSchema.methods.matchPassword = async function (enteredPassword: string) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
@@ -49,6 +57,6 @@ userSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model<UserDocument>('User', userSchema);
 
 export default User;
