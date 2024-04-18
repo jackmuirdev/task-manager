@@ -1,7 +1,7 @@
 import express from "express";
+import { getUserProfile, getUsers, getUserById, registerUser, deleteUser, loginUser, logoutUser, updateUserProfile } from "../controllers/userControllers";
+import { protect, admin } from "../middleware/authMiddleware";
 const router = express.Router();
-import { getUsers, getUserById, registerUser, deleteUser, loginUser, logoutUser, getUserProfile, updateUserProfile } from "../controllers/userControllers.js";
-import { protect, admin } from '../middleware/authMiddleware.js';
 
 // GET /profile - Get the user's profile
 router.get('/profile', protect, getUserProfile);

@@ -1,7 +1,7 @@
 import express from "express";
+import { createTask, deleteTask, getTaskById, getTasks, updateTask } from "../controllers/taskControllers";
+import { protect } from "../middleware/authMiddleware";
 const router = express.Router();
-import { getTasks, getTaskById, createTask, updateTask, deleteTask } from "../controllers/taskControllers.js";
-import { protect } from '../middleware/authMiddleware.js';
 
 // GET /tasks - Get all tasks
 router.get('/', protect, getTasks);
