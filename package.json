@@ -5,6 +5,8 @@
   "main": "server.js",
   "scripts": {
     "backend": "nodemon backend/server.ts",
+    "frontend": "npm start --prefix frontend",
+    "dev": "concurrently \"npm run frontend\" \"npm run backend\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jack Muir",
