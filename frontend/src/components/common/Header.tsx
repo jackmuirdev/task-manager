@@ -13,13 +13,18 @@ import { IconButton, Menu, ThemeProvider } from '@mui/material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ViewTimelineIcon from '@mui/icons-material/ViewTimeline';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { theme } from '../utils/Theme';
 import NotReady from '../error/NotReady';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useAuth } from '../../utils/AuthContext';
 
 function Header() {
   const [open, setOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+  const navigate = useNavigate();
+  const { isLoggedIn, username, logout } = useAuth();
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
@@ -31,8 +36,22 @@ function Header() {
 
   const handleClose = () => {
     setAnchorEl(null);
-    setOpen(false)
+    setOpen(false);
   };
+
+  const logoutHandler = async () => {
+    try {
+      const response = await axios.post("http://localhost:10000/api/users/logout");
+      logout();
+      console.log("User logged out successfully:", response.data);
+      toast.success("Logout Successful");
+      handleClose();
+      navigate("/");
+    } catch (error) {
+      console.error("Unexpected error occurred:", error);
+      toast.error("Login failed");
+    }
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -87,9 +106,12 @@ function Header() {
                     to='/'
                     sx={{ py: '6px', px: '12px' }}
                   >
-                    <Typography color="text.primary">
-                      Dashboard
-                    </Typography>
+                    <IconButton color="primary">
+                      <DashboardIcon />
+                      <Typography color="text.primary" sx={{marginLeft: "5px"}}>
+                        Dashboard
+                      </Typography>
+                    </IconButton>
                   </MenuItem>
                   <MenuItem
                     component={Link}
@@ -97,9 +119,12 @@ function Header() {
                     sx={{ py: '6px', px: '12px' }}
                     onClick={NotReady}
                   >
-                    <Typography color="text.primary">
-                      Timeline
-                    </Typography>
+                    <IconButton color="primary">
+                      <ViewTimelineIcon />
+                      <Typography color="text.primary" sx={{marginLeft: "5px"}}>
+                        Timeline
+                      </Typography>
+                    </IconButton>
                   </MenuItem>
                 </Box>
               </Box>
@@ -110,24 +135,51 @@ function Header() {
                   alignItems: 'center',
                 }}
               >
-                <IconButton
-                  color="primary"
-                  aria-label="account menu"
-                  aria-controls="account-menu"
-                  aria-haspopup="true"
-                  onClick={handleClick}
-                >
-                  <AccountCircle />
-                </IconButton>
-                <Menu
-                  id="account-menu"
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleClose}
-                >
-                  <MenuItem onClick={handleClose} component={Link} to='/login'>Login</MenuItem>
-                  <MenuItem onClick={handleClose} component={Link} to='/register'>Register</MenuItem>
-                </Menu>
+                {isLoggedIn ? (
+                  <>
+                    <Button onClick={handleClick}>
+                      <AccountCircle sx={{marginRight: "5px"}} />
+                      {username}
+                    </Button>
+                    <Menu
+                      id="account-menu"
+                      anchorEl={anchorEl}
+                      open={Boolean(anchorEl)}
+                      onClose={handleClose}
+                    >
+                      <MenuItem component={Link} to="/profile" onClick={handleClose}>
+                        Profile
+                      </MenuItem>
+                      <MenuItem onClick={logoutHandler}>
+                        Logout
+                      </MenuItem>
+                    </Menu>
+                  </>
+                ) : (
+                  <>
+                    <IconButton
+                      color="primary"
+                      aria-label="account menu"
+                      aria-controls="account-menu"
+                      aria-haspopup="true"
+                      onClick={handleClick}
+                    >
+                      <AccountCircle />
+                      <Typography color="textPrimary" sx={{textDecoration: "none", marginLeft: "5px"}}>
+                        Profile
+                      </Typography>
+                    </IconButton>
+                    <Menu
+                      id="account-menu"
+                      anchorEl={anchorEl}
+                      open={Boolean(anchorEl)}
+                      onClose={handleClose}
+                    >
+                      <MenuItem onClick={handleClose} component={Link} to='/login'>Login</MenuItem>
+                      <MenuItem onClick={handleClose} component={Link} to='/register'>Register</MenuItem>
+                    </Menu>
+                  </>
+                )}
               </Box>
               <Box sx={{ display: { sm: '', md: 'none' } }}>
                 <Button
@@ -165,39 +217,37 @@ function Header() {
                         aria-haspopup="true"
                       >
                         <DashboardIcon />
-                        <Typography variant="body2" color="text.primary" sx={{textDecoration: "none"}}>
+                        <Typography variant="body2" color="text.primary" sx={{textDecoration: "none", marginLeft: "5px"}}>
                           Dashboard
                         </Typography>
                       </IconButton>
                     </MenuItem>
                     <Divider />
                     <MenuItem onClick={NotReady} component={Link} to='#'>
-                    <IconButton
+                      <IconButton
                         color="primary"
                         aria-label="account menu"
                         aria-controls="account-menu"
                         aria-haspopup="true"
-                        // once implemented, change to component={Link} to='/timeline'
-                        // and remove onClick={NotReady}
-                        // add onClick={handleClick}
                       >
                         <ViewTimelineIcon />
-                        <Typography variant="body2" color="text.primary" sx={{textDecoration: "none"}}>
+                        <Typography variant="body2" color="text.primary" sx={{textDecoration: "none", marginLeft: "5px"}}>
                           Timeline
                         </Typography>
                       </IconButton>
                     </MenuItem>
                     <Divider />
-                    <MenuItem onClick={handleClick}>
+                    <MenuItem>
                       <IconButton
                         color="inherit"
                         aria-label="account menu"
                         aria-controls="account-menu"
                         aria-haspopup="true"
+                        onClick={handleClick}
                       >
                         <AccountCircle />
-                        <Typography variant="body2" color="textPrimary" sx={{textDecoration: "none"}}>
-                          Profile
+                        <Typography variant="body2" color="textPrimary" sx={{textDecoration: "none", marginLeft: "5px"}}>
+                          {isLoggedIn ? username : "Profile"}
                         </Typography>
                       </IconButton>
                       <Menu

@@ -5,6 +5,7 @@ import { theme } from "../../components/utils/Theme";
 import axios, { AxiosError } from "axios";
 import { ChangeEvent, useState } from "react";
 import { toast } from "react-toastify";
+import { useAuth } from "../../utils/AuthContext";
 
 interface ErrorResponse {
   message: string;
@@ -17,6 +18,7 @@ export default function LoginScreen() {
     email: "",
     password: ""
   });
+  const { login } = useAuth();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -29,6 +31,7 @@ export default function LoginScreen() {
       const response = await axios.post("http://localhost:10000/api/users/login", formData);
       console.log("User logged in successfully:", response.data);
       toast.success("Login Successful");
+      login(formData.username);
       navigate("/");
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
