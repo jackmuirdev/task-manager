@@ -37,30 +37,38 @@ export const loginUser = asyncHandler(async (req, res) => {
 export const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
 
-  const userExists = await User.findOne({ email });
+  try {
+    const userExists = await User.findOne({ email });
 
-  if (userExists) {
-    res.status(400).json({ message: 'Email already in use' });
-    return;
-  }
+    if (userExists) {
+      res.status(400).json({ message: ' Email already in use' });
+      return;
+    }
 
-  const user = await User.create({
-    username,
-    email,
-    password
-  });
-
-  if (user) {
-    generateToken(res, user._id);
-
-    res.status(201).json({
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      isAdmin: user.isAdmin,
+    const user = await User.create({
+      username,
+      email,
+      password
     });
-  } else {
-    res.status(400).json({ message: 'Invalid user data' });
+
+    if (user) {
+      generateToken(res, user._id);
+
+      res.status(201).json({
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      });
+    } else {
+      res.status(400).json({ message: 'Invalid user data' });
+    }
+  } catch (error: any) {
+    if (error.code === 11000 && error.keyPattern && error.keyPattern.username) {
+      return res.status(400).json({ message: 'Username is already in use' });
+    }
+    console.error(error);
+    res.status(400).json({ message: 'Registration failed' });
   }
 });
 

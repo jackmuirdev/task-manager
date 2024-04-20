@@ -23,7 +23,7 @@ function Header() {
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
-  };
+  }; 
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -31,6 +31,7 @@ function Header() {
 
   const handleClose = () => {
     setAnchorEl(null);
+    setOpen(false)
   };
 
   return (
@@ -92,7 +93,7 @@ function Header() {
                   </MenuItem>
                   <MenuItem
                     component={Link}
-                    to="/"
+                    to="#"
                     sx={{ py: '6px', px: '12px' }}
                     onClick={NotReady}
                   >
@@ -156,46 +157,43 @@ function Header() {
                       }}
                     >
                     </Box>
-                    <MenuItem>
+                    <MenuItem component={Link} to='/' onClick={handleClose}>
                       <IconButton
                         color="primary"
                         aria-label="account menu"
                         aria-controls="account-menu"
                         aria-haspopup="true"
-                        onClick={handleClick}
                       >
                         <DashboardIcon />
-                        <Typography variant="body2" color="text.primary" sx={{textDecoration: "none"}} component={Link} to='/'>
+                        <Typography variant="body2" color="text.primary" sx={{textDecoration: "none"}}>
                           Dashboard
                         </Typography>
                       </IconButton>
                     </MenuItem>
                     <Divider />
-                    <MenuItem>
+                    <MenuItem onClick={NotReady} component={Link} to='#'>
                     <IconButton
                         color="primary"
                         aria-label="account menu"
                         aria-controls="account-menu"
                         aria-haspopup="true"
-                        onClick={NotReady}
                         // once implemented, change to component={Link} to='/timeline'
                         // and remove onClick={NotReady}
                         // add onClick={handleClick}
                       >
                         <ViewTimelineIcon />
-                        <Typography variant="body2" color="text.primary" sx={{textDecoration: "none"}} component={Link} to='/'>
+                        <Typography variant="body2" color="text.primary" sx={{textDecoration: "none"}}>
                           Timeline
                         </Typography>
                       </IconButton>
                     </MenuItem>
                     <Divider />
-                    <MenuItem>
+                    <MenuItem onClick={handleClick}>
                       <IconButton
                         color="inherit"
                         aria-label="account menu"
                         aria-controls="account-menu"
                         aria-haspopup="true"
-                        onClick={handleClick}
                       >
                         <AccountCircle />
                         <Typography variant="body2" color="textPrimary" sx={{textDecoration: "none"}}>
@@ -204,12 +202,9 @@ function Header() {
                       </IconButton>
                       <Menu
                         id="account-menu"
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        onClose={handleClose}
                       >
-                        <MenuItem onClick={handleClose} component={Link} to='/login'>Login</MenuItem>
-                        <MenuItem onClick={handleClose} component={Link} to='/register'>Register</MenuItem>
+                        <MenuItem component={Link} to='/login'>Login</MenuItem>
+                        <MenuItem component={Link} to='/register'>Register</MenuItem>
                       </Menu>
                     </MenuItem>
                   </Box>
